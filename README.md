@@ -1,7 +1,7 @@
 
 # **Engenharia Reversa e Manipulação de Memória**.
 
-Repositorio com objetivo de ter habilidade de usar técnicas de hacking de jogos com a ferramenta **Cheat Engine** para hackear a memória de programas em execução no Windows e modificar seu comportamento.
+Repositorio com objetivo de ter habilidade de usar técnicas de hacking para memória de programas em execução no Windows e modificar seu comportamento.
 
 Praticas e métodos apropriados, especialmente programados para o aprendizado de engenharia reversa.
 

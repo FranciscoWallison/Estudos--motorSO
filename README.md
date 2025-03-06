@@ -21,7 +21,7 @@ Ao aprimorar suas habilidades, você aprenderá a:
 - Compreender as limitações e vulnerabilidades da proteção de software;
 - E muito mais.
 
-### Para quem é este curso?
+### Para quem é este repositorio?
 
 Com objetivo de aprender **engenharia reversa**, incluindo:
 

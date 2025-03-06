@@ -30,6 +30,7 @@ Com objetivo de aprimora habilidades como:
 
 ### Pré-requisitos
 
-Algum conhecimento básico de **Assembly** pode ser útil, mas não é obrigatório. Eu ensinarei tudo o que você precisa saber sobre manipulação de memória.
+Algum conhecimento básico de **Assembly** pode ser útil, mas não é obrigatório. 
+O foco é aprender tudo o que precisa saber sobre manipulação de memória.
 
 ---

@@ -1,4 +1,3 @@
-# Estudos---motorSO
 
 **Engenharia Reversa e Manipulação de Memória**.
 

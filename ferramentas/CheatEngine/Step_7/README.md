@@ -25,23 +25,28 @@ Iremos sacaner o valor, que no meu caso é *99* até achar o endereço de memori
 ![alt text](image-3.png)
 
 No meu caso o endereço é *0176B600*
+
 ![alt text](image-4.png)
 
 Apos seleciona a memoria precisaremos ir para o modo de depuração/debugger do CE
 
 **(Find out what accesses this address F5)**
+
 ![alt text](image-5.png)
 
 Ao clicar em (HIT ME) irá aprensetar o evento em tela sobre o endereço que estamos observado, que no meu caso *0176B600*
+
 ![alt text](image-6.png)
 
 Conforme a instruction teremos as inforamções na lateral de
 **Copy memory** como **leitura/reading** e **subtract** como **escrita/writing**
 
 Com a instrução selecionada iremos usar o "show disassembler";
+
 ![alt text](image-7.png) 
 
 Ira mostrar a tela de Memory Viewer
+
 ![alt text](image-8.png)
 
 Vamos analisar essa instrução de **Assembly** passo a passo:

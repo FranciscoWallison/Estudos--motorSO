@@ -211,6 +211,8 @@ Agora que temos o código pronto, siga os passos para **compilar e instalar** o 
 
 [Desabilitar Imposição De Assinatura De Drivers No Windows 11](https://mspoweruser.com/driver-signature-enforcement-windows-11/?language=pt)
 
+[Criar um certificado público autoassinado para autenticar seu aplicativo](https://learn.microsoft.com/pt-br/entra/identity-platform/howto-create-self-signed-certificate)
+
 ### **✅ Instalar e Iniciar o Driver**
 Agora, vamos **instalar e rodar** o driver manualmente.
 

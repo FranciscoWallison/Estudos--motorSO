@@ -7,9 +7,7 @@
 
 > **Handle** É um identificador abstrato (geralmente um número inteiro) usado pelo sistema operacional para referenciar recursos internos [Mais sobre](https://github.com/FranciscoWallison/Estudos---motorSO/tree/main/ferramentas/python/Handle.md)
 
-> **Shellcode** é um bloco de código binário (geralmente em assembly) que é escrito para ser injetado e executado dentro da memória de um processo. Ele é chamado assim porque originalmente era usado para abrir um shell (prompt de comandos) quando executado – daí o nome “shell-code”.
-
-Hoje, o termo se expandiu e se refere a qualquer código executável inserido na memória com a intenção de ser rodado, independentemente de abrir um shell ou não.
+> **Shellcode** é um bloco de código binário (geralmente em assembly) que é escrito para ser injetado e executado dentro da memória de um processo. Ele é chamado assim porque originalmente era usado para abrir um shell (prompt de comandos) quando executado – daí o nome “shell-code”. Hoje, o termo se expandiu e se refere a qualquer código executável inserido na memória com a intenção de ser rodado, independentemente de abrir um shell ou não.
 
 ### 🧪 **Funções da API Win32 – O que cada uma faz?**
 

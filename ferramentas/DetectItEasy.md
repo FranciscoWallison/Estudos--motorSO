@@ -1,0 +1,1 @@
+[Detect-It-Easy](https://github.com/horsicq/Detect-It-Easy)

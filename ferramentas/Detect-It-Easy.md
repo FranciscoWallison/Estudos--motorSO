@@ -10,3 +10,5 @@ por script o torna uma das ferramentas mais versáteis no campo, com uma lista
 abrangente de imagens de SO suportadas.
 
 [DIE-engine](https://github.com/horsicq/DIE-engine/releases)
+
+[Detect-It-Easy](https://github.com/horsicq/Detect-It-Easy)

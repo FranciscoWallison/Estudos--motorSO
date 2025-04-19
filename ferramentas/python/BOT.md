@@ -57,6 +57,6 @@ Confirma se o mouse está no local desejado com uma margem de erro, antes de cli
 
 ---
 
-## ✍️ **Resumo para Artigo**
+## ✍️ **Resumo**
 
 > O script implementa uma automação para o jogo *RPG Online*, monitorando a barra de vida do personagem via captura de tela (com `mss`) e processando a imagem com `numpy`. Com base na vida restante, ele aciona uma cadeia de comandos usando scripts AutoHotkey para curar o personagem. Essa automação é integrada ao sistema operacional usando bibliotecas como `pyautogui` e `win32gui`, fornecendo um exemplo prático de como interações com interfaces gráficas e jogos podem ser realizadas de forma programática.

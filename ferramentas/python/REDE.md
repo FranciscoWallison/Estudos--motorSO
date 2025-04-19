@@ -1,5 +1,5 @@
 
-## 🧠 **Objetivo do Script**
+## 🧠 [**Objetivo do Script**](https://github.com/FranciscoWallison/Estudos---motorSO/blob/main/ferramentas/python/rede/script.py)
 
 O script tem como finalidade **capturar pacotes de rede TCP**, especificamente trocados com os IPs `35.199.111.15` e `35.247.221.22`, registrá-los em **JSON estruturado** e exibir em tempo real em uma **interface gráfica** desenvolvida em `tkinter`.
 

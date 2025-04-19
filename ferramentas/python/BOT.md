@@ -1,4 +1,4 @@
-## 🎯 **Objetivo do Script**
+## 🎯[ **Objetivo do Script**](https://github.com/FranciscoWallison/Estudos---motorSO/blob/main/ferramentas/python/bot/Script.py)
 Este código monitora automaticamente a barra de vida (HP) do personagem no jogo *Ragnarok Online*. Quando a vida está abaixo de um determinado limiar (ex: 70%), o script executa uma sequência de ações usando scripts [AutoHotkey](https://www.autohotkey.com/) (`.ahk`) para curar o personagem, mover o mouse e realizar cliques na interface do jogo.
 
 ---

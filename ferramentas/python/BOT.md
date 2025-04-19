@@ -1,5 +1,5 @@
 ## 🎯[ **Objetivo do Script**](https://github.com/FranciscoWallison/Estudos---motorSO/blob/main/ferramentas/python/bot/Script.py)
-Este código monitora automaticamente a barra de vida (HP) do personagem no jogo *Ragnarok Online*. Quando a vida está abaixo de um determinado limiar (ex: 70%), o script executa uma sequência de ações usando scripts [AutoHotkey](https://www.autohotkey.com/) (`.ahk`) para curar o personagem, mover o mouse e realizar cliques na interface do jogo.
+Este código monitora automaticamente a barra de vida (HP) do personagem no jogo *RPG Online*. Quando a vida está abaixo de um determinado limiar (ex: 70%), o script executa uma sequência de ações usando scripts [AutoHotkey](https://www.autohotkey.com/) (`.ahk`) para curar o personagem, mover o mouse e realizar cliques na interface do jogo.
 
 ---
 
@@ -47,7 +47,7 @@ Confirma se o mouse está no local desejado com uma margem de erro, antes de cli
 ## ⚙️ **Lógica Principal**
 
 1. **Valida se o AutoHotkey está instalado**.
-2. **Procura continuamente a janela do Ragnarok.**
+2. **Procura continuamente a janela do RPG.**
 3. Se encontrada:
    - Ativa a janela.
    - Verifica a porcentagem de vida do personagem.
@@ -59,4 +59,4 @@ Confirma se o mouse está no local desejado com uma margem de erro, antes de cli
 
 ## ✍️ **Resumo para Artigo**
 
-> O script implementa uma automação para o jogo *Ragnarok Online*, monitorando a barra de vida do personagem via captura de tela (com `mss`) e processando a imagem com `numpy`. Com base na vida restante, ele aciona uma cadeia de comandos usando scripts AutoHotkey para curar o personagem. Essa automação é integrada ao sistema operacional usando bibliotecas como `pyautogui` e `win32gui`, fornecendo um exemplo prático de como interações com interfaces gráficas e jogos podem ser realizadas de forma programática.
+> O script implementa uma automação para o jogo *RPG Online*, monitorando a barra de vida do personagem via captura de tela (com `mss`) e processando a imagem com `numpy`. Com base na vida restante, ele aciona uma cadeia de comandos usando scripts AutoHotkey para curar o personagem. Essa automação é integrada ao sistema operacional usando bibliotecas como `pyautogui` e `win32gui`, fornecendo um exemplo prático de como interações com interfaces gráficas e jogos podem ser realizadas de forma programática.

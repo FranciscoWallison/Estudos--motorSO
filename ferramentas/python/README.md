@@ -127,3 +127,113 @@ CreateRemoteThread(hProcess, NULL, 0, LoadLibraryA, remote_addr, 0, NULL)
 
 _______________________________________________________________
 
+
+## 🧠 O que é análise de pacotes?
+
+A **análise de pacotes** (ou *packet sniffing*) é o processo de **observar e inspecionar os dados que trafegam pela rede**, em tempo real. Cada pacote contém informações como:
+
+- Endereço de origem e destino (IP e porta)
+- Tipo de protocolo (TCP, UDP, etc.)
+- Dados enviados (o “conteúdo” do pacote)
+
+---
+
+## 🛠 Como funciona?
+
+### 1. **Captura de pacotes**
+Uma ferramenta (como `Scapy`, `Wireshark` ou `pydivert`) intercepta os pacotes que passam pela interface de rede do computador.
+
+### 2. **Leitura e separação**
+O conteúdo de cada pacote é analisado:
+- De onde veio?
+- Para onde vai?
+- Que tipo de dado está carregando?
+
+### 3. **Visualização**
+Os pacotes podem ser exibidos de forma legível para humanos — como JSON, texto ou interface gráfica — facilitando a interpretação.
+
+### 4. **Filtragem**
+Você pode definir filtros para capturar só o que interessa. Exemplo:
+- Pacotes apenas de um jogo específico
+- Somente tráfego TCP para determinada porta
+
+---
+
+## 🔎 Para que serve?
+
+- **Monitoramento de tráfego** (quem está se comunicando com quem)
+- **Debug de redes e aplicações**
+- **Detecção de intrusos ou malwares**
+- **Estudo do comportamento de programas (ex: jogos online)**
+
+---
+
+## 🧪 Exemplo prático
+
+Imagine um jogo online. Cada vez que você clica para atacar um monstro, o jogo envia um pacote para o servidor. Com a análise de pacotes, você pode:
+- Ver o formato desse pacote
+- Registrar o que foi enviado
+- Tentar reproduzir o envio (ex: com um bot ou automação)
+
+_______________________________________________________________
+
+## 🤖 Sobre "bot"
+
+Um **bot** é um script que **automatiza ações humanas** em um programa ou jogo — como clicar, digitar, mover o mouse ou interagir com janelas — tudo isso **sem a pessoa estar presente**.
+
+---
+
+## 🔍 Como eles funcionam? (Passo a passo)
+
+### 1. **Localizam a janela**
+- Usam funções da API do Windows (como `FindWindow`, `EnumWindows`, etc.) para **encontrar a janela** de um programa ou jogo pelo **nome/título**.
+- Em Python, usa-se a lib `win32gui`.
+- Em AutoHotkey, basta `WinActivate`, `WinExist`, etc.
+
+```ahk
+If WinExist("jogo_RPG")
+    WinActivate  ; ativa a janela
+```
+
+---
+
+### 2. **Trazem a janela para frente**
+- Usam comandos como `SetForegroundWindow` ou `WinActivate` para **focar** a janela no topo, garantindo que os comandos sejam enviados para o programa certo.
+
+---
+
+### 3. **Movem o mouse e clicam**
+- Usam funções como `mouse_event`, `SetCursorPos` ou `Click`.
+- Com AutoHotkey, é comum usar `MouseMove`, `Click`, `Send`.
+
+```ahk
+MouseMove, 300, 400
+Click
+```
+
+---
+
+### 4. **Detectam elementos visuais**
+- Capturam pedaços da tela (screenshot) usando libs como `mss`, `pyautogui`, `opencv` ou funções do AutoHotkey (`PixelGetColor`, `ImageSearch`).
+- Comparam pixels para ver, por exemplo, **se a barra de vida está baixa** ou **se um botão está visível**.
+
+---
+
+### 5. **Tomam decisões simples**
+- Comparam valores de pixels, coordenadas ou estados de janelas para decidir se **devem curar**, **clicar**, **usar skill**, etc.
+- São scripts com lógica `if`, `else`, `loop`, etc.
+
+---
+
+## 💡 Exemplo comum
+Um script pode:
+- Detectar que a vida está abaixo de 70%
+- Ativar a janela do jogo
+- Clicar na tecla de cura (como F1)
+- Esperar e verificar novamente
+
+---
+
+## ⚠️ Observações
+- Bots **não veem como humanos**. Eles **simulam ações** com base em pixels e posições fixas.
+- Muitos jogos tentam **bloquear esse tipo de automação**, usando anti-cheats que detectam movimentações não humanas ou alterações de janela.

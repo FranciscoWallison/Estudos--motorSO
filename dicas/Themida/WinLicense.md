@@ -43,7 +43,7 @@ Ela **executa o binário protegido dinamicamente** (como um debugger automatizad
 ### 💻 **Como usar pelo terminal (CLI):**
 
 ```bash
-unlicense.exe Ragexe.exe --verbose
+unlicense.exe GAme.exe --verbose
 ```
 
 Outros flags úteis:
@@ -64,7 +64,7 @@ pip install git+https://github.com/ergrelet/unlicense.git
 Ou clone o repositório e use:
 
 ```bash
-python -m unlicense Ragexe.exe
+python -m unlicense GAme.exe
 ```
 
 ---

@@ -55,100 +55,75 @@ Outros flags úteis:
 
 ---
 
-### 📦 **Instalação via pip (modo avançado):**
+
+
+# DUMP COM [pe-sieve](https://github.com/hasherezade/pe-sieve)
+
 
 ```bash
-pip install git+https://github.com/ergrelet/unlicense.git
+.\pe-sieve32.exe /pid 20380 /refl /data 4 /threads `
+  /dmode 3 /imp 5 /ofilter 0 /dir ".\dump_20380"
 ```
 
-Ou clone o repositório e use:
 
-```bash
-python -m unlicense GAme.exe
-```
+Deposi que gerar o dump renomeie 400000.Game.exe para Game_dump.exe antes de abrir em IDA/Ghidra.
+
+
+
+| Campo                | Valor | Significado prático                                                                        |
+| -------------------- | ----- | ------------------------------------------------------------------------------------------ |
+| **Total scanned**    | 120   | DLLs + blobs mapeados                                                                      |
+| **Hooked**           | 7     | Funções sobrescritas (provavelmente `aswhook.dll` do AntiVirus + interceptações do anticheat) |
+| **Hdrs Modified**    | 2     | Cabeçalhos PE corrompidos/stripados, comum em autoproteção                                 |
+| **Implanted**        | 2 SHC | Dois blocos de shellcode injetado (salvos em `*.shc`)                                      |
+| **Total suspicious** | 11    | Soma dos itens que o pE-Sieve marcou como anômalos                                         |
+
+
+| Passo                                                                  | Comando/sugestão                                                                                                                              | Por quê                                                                           |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| 1. Suspenda todas as threads do alvo na hora do dump                   | `Process Hacker ➜ botão direito ➜ Suspend` ou `pe-sieve32.exe /pid 20380 /pause 1`                                                            | Evita que o anticheat troque proteções durante a leitura                          |
+| 2. Force leitura de páginas inacessíveis                               | `pe-sieve32.exe /pid 20380 /ofilter 2 /force_read 1`                                                                                          | Tenta ler mesmo em páginas **NOACCESS** (usa `NtProtectVirtualMemory` temporário) |
+| 3. Capture só módulos PE válidos                                       | `... /mfilter 1`                                                                                                                              | Evita perder tempo em `.des` ou `.asi` não-PE                                     |
+| 4. Se falhar, deixe o próprio Gepard inicializar **antes** de anexar   | Inicie o jogo, aguarde chegar à seleção de personagem, **depois** rode o pE-Sieve                                                             | Após checksums iniciais, algumas páginas voltam a ser **READONLY**                |
+| 5. Use versão *devel* do pE-Sieve (≥0.3.5-beta)                        | Build com `/READ_OUT_OF_BOUNDS` habilitado                                                                                                    | Essa flag ignora tamanho errado de seção ao reconstruir headers                   |
+| 6. Como alternativa, use **ScyllaHide + Scylla** num debugger (x64dbg) | O plugin *ScyllaHide* mascara chamadas `IsDebuggerPresent`, etc., e o Scylla usa *Import Rebuilder* que às vezes consegue onde pE-Sieve falha |                                                                                   |
+---
+# Guia de Análise e Depuração de Dumps
+
+## 1 · Fluxo Passo-a-Passo
+
+| # | Etapa | Ferramentas | Procedimento Resumido | Observações |
+|---|-------|-------------|-----------------------|-------------|
+| 1 | **Validar dump** | **Ghidra** | Importar como **PE with imported symbols**; conferir seções `.text`, `.rdata`, etc. | Se algo faltar, siga para a etapa 2. |
+| 2 | **Reconstruir Import Table** | **pE-Bear**&nbsp;/&nbsp;**Scylla** | Rodar sobre o dump com as mesmas flags (`/R1`, `/R2`, …) usadas no dump. | Necessário apenas se a Import Table estiver vazia. |
+| 3 | **Revisar hooks (`ntdll.dll`)** | **IDA** + **BinDiff** | Comparar `ntdll` do dump com a cópia limpa do sistema. | Ignore hooks de antivírus; foco nos que apontam para `cps.dll` ou arquivos `*.shc` (Gepard). |
+| 4 | **Analisar shellcodes (`*.shc`)** | **Cutter**&nbsp;/&nbsp;**IDA** | Abrir como *Raw binary* (base 0) e procurar APIs `OpenProcess`, `VirtualProtect`, `ReadProcessMemory`. | Cada arquivo ≈ 6 – 8 KB; chamadas a essas APIs indicam anti-debug. |
+| 5 | **Obter DLLs limpas** | VM limpa + dumper | Repetir o dump em uma VM recém-instalada sem antivírus. | Garante cópias originais das DLLs para comparação. |
+| 6 | **Automatizar diffs** | **LIEF**, **Diaphora** | `lief --diff original.dll patched.dll` ou plugin Diaphora (IDA). | Saída byte-a-byte ou *scoring* rápido de funções. |
 
 ---
 
-### 📎 **Tecnologias usadas:**
+## 2 · Atalhos de Ferramentas
 
-* **Frida**: framework para injetar scripts durante execução
-* **Scylla**: para reconstrução de Import Tables
-* **Python**: automação de dumping e análise
-
----
-
-### 🧠 **Quando usar essa ferramenta:**
-
-* Quando o executável está fortemente protegido com **Themida ou WinLicense**
-* Você precisa extrair o código real para análise com Ghidra/IDA
-* Softwares empacotados não funcionam em debuggers (como x64dbg) ou retornam instruções ilegíveis
-
-
-### Ferramentas (gratuitas ou open-source) que hoje conseguem **desempacotar ou, no mínimo, contornar** proteções Themida/WinLicense 3.x
-
-| Finalidade                             | Ferramenta                                                                                                        | Observações rápidas                                                                                                                       |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Unpack automático por emulação**     | **Unlicense**                                                                                                     | CLI em Python, lida com 32 / 64 bit, restaura OEP e tabela de importações. Bom ponto de partida para dumps rápidos. ([github.com][1])     |
-|                                        | **bobalkkagi**                                                                                                    | Emulador/hooker em Python voltado para Themida 3.1.3; vários modos (fast, hook\_code, hook\_block). ([github.com][2])                     |
-|                                        | *Magicmida*                                                                                                       | Auto-unpacker 32-bit; funciona em alguns alvos, mas manutenção irregular (requer conta no ExeTools). ([forum.exetools.com][3])            |
-| **Bypass de anti-debug / VMChecks**    | **Themidie (plugin x64dbg)**                                                                                      | Hooka APIs críticas e desarma checagens anti-debug da linha 3.x (x64). Útil antes de fazer dump manual. ([github.com][4])                 |
-|                                        | **ScyllaHide**                                                                                                    | Biblioteca anti-anti-debug com perfis prontos (x64dbg, Olly, etc.). Carregue o perfil “Themida/WinLicense” ou “Custom”. ([github.com][5]) |
-|                                        | **TitanHide**                                                                                                     | Versão ring-0; só se o alvo detectar debuggers em kernel mode.                                                                            |
-| **Dump + reconstrução de importações** | **Scylla / Scylla-x64dbg**                                                                                        | Depois de pausar no OEP, faça “Dump PE” + “Fix Import”.                                                                                   |
-|                                        | **PE-sieve**                                                                                                      | Boa para dumps parciais em casos de processos que se auto-deletam.                                                                        |
-| **Scripts para x64dbg**                | **OEP/Import finders** no repositório *x64dbg/Scripts*; há um “Themida & VMProtect OEP Finder”. ([github.com][6]) |                                                                                                                                           |
-| **Comunidades / tutoriais**            | Tuts4You, RevTeam, ExeTools                                                                                       | Repositórios de scripts, unpack-mes e discussões. ([forum.tuts4you.com][7], [revteam.re][8])                                              |
+| Objetivo | Ferramentas | Uso Rápido / Dicas |
+|----------|-------------|--------------------|
+| Desempacotar e analisar o executável | **Ghidra** (Auto-analysis) | Se faltar importações, reabra com **`/imp 5`** para análise agressiva. |
+| Unhook temporário | `hollow-unhook.py` • **x64dbg** (*byte-patch manual*) | Faça somente em VM isolada - pode quebrar o anticheat. |
+| Rodar jogo com dump limpo | **Process Hollow** | Injetar `400000.game.exe` no processo suspenso → depuração sem Gepard. |
+| Comparar com executável original | **CFF Explorer** • **Detect It Easy** | Verifique se o packer alterou seções, timestamps ou assinaturas. |
 
 ---
 
-#### Fluxo de trabalho “rápido”
+> ⚠️ **Boa prática de segurança:** execute todas as etapas em máquinas virtuais descartáveis, salve *snapshots* antes das modificações e respeite as licenças de software.
 
-1. **Teste um auto-unpacker**
 
-   ```bash
-   # 64-bit
-   unlicense.exe protected.exe
-   # 32-bit
-   unlicense32.exe protected.exe
-   ```
+## Verificando hooks
+x64dbg
+Fila > Open ➜ escolha o executável 400000.game.exe (modo “rebase at load”).
+Use o plugin ScyllaHide para evitar detecção de debugger.
 
-   Se o dump rodar, ótimo; senão, parta para o modo manual.
+No painel Symbols, pesquise pelas funções que aparecem nos hooks do JSON (ex.: NtOpenProcess, LoadLibraryA).
 
-2. **Bypass anti-debug antes de anexar debugger**
+Navegue até o endereço informado e confirme se há um JMP rel32 para fora do módulo.
 
-   * Copie *Themidie.dll* + *.dp64* e *ScyllaHide* para a pasta *plugins* do x64dbg.
-   * Abra x64dbg → Plugins → ScyllaHide → Options → **Kill Anti-Attach** apenas → OK.
-   * Plugins → Themidie → Start → selecione o executável. Isso suspende o alvo num ponto seguro para anexo. ([github.com][4])
-
-3. **Encontrar OEP e fazer dump**
-
-   * Quando parar no módulo Themida, siga as instruções do script *OEP Finder* (ou pressione *Run* se estiver usando o script automático). ([github.com][6])
-   * No OEP: Scylla → **Dump PE** → **Fix Import**.
-
-4. **Refinar**
-
-   * Caso o binário continue quebrando: recalcule relocations, corrija section flags e verifique TLS callbacks residuais.
-   * Para executáveis WinLicense com arquivo de licença, copie o *.wllic* para o mesmo diretório do dump.
-
----
-
-#### Dicas rápidas
-
-* **VM isolada** – Ferramentas dinâmicas executam o alvo; use snapshot para evitar infecção.
-* **32-bit vs 64-bit** – Use Python 32-bit para dump 32-bit com Unlicense; bobalkkagi cobre só alguns builds 64-bit.
-* **Versões recentes** – Themida 3.2.3.0 (mar 2025) introduziu pequenas mudanças no stub, mas Unlicense v0.4 e Themidie já cobrem.
-* **Limitações** – Proteção por virtualização (VM) ainda exige engenharia manual ou devirtualizadores privados; nenhuma ferramenta open-source faz “devirtualização total” de 3.x.
-
----
-
-> **Uso ético**: empregar essas técnicas apenas em ambientes de pesquisa, auditoria de segurança ou onde a licença permita engenharia reversa.
-
-[1]: https://github.com/ergrelet/unlicense "GitHub - ergrelet/unlicense: Dynamic unpacker and import fixer for Themida/WinLicense 2.x and 3.x."
-[2]: https://github.com/bobalkkagi/bobalkkagi "GitHub - bobalkkagi/bobalkkagi: Themida 3.x unpacking, unwrapping and devirtualization(future)"
-[3]: https://forum.exetools.com/showthread.php?t=20466&utm_source=chatgpt.com "Magicmida - Themida unpacker - Exetools"
-[4]: https://github.com/VenTaz/Themidie "GitHub - VenTaz/Themidie: x64dbg plugin to bypass Themida 3.x Anti-Debugger / VM / Monitoring programs checks (x64)"
-[5]: https://github.com/x64dbg/ScyllaHide?utm_source=chatgpt.com "x64dbg/ScyllaHide: Advanced usermode anti-anti ... - GitHub"
-[6]: https://github.com/x64dbg/Scripts/commits?utm_source=chatgpt.com "Commits · x64dbg/Scripts - GitHub"
-[7]: https://forum.tuts4you.com/topic/44124-themida-x32-v3040/page/2/?utm_source=chatgpt.com "Themida x32 v3.0.4.0 - Page 2 - UnPackMe - Tuts4You forum"
-[8]: https://revteam.re/forum/threads/themida-winlicense-2-x-and-3-x-unpacker.1230/ "Themida/WinLicense 2.x and 3.x Unpacker | RevTeam.Re - Reverse Engineering Team"
-
+Se o salto for para aswhook.dll (antivirus) ou npggNT.des, isso explica a contagem “Hooked 7”.

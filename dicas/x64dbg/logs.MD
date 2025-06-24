@@ -164,6 +164,10 @@ Lembre-se de fechar o arquivo de log com `log close` quando terminar.
 
 ```x64dbg
 log "ENDEREÇO: {p:cip} | BYTES: {mem;8@cip} | INSTRUÇÃO: {dis.text(cip)} | REGISTRADORES: RAX={rax} RBX={rbx} RCX={rcx} RDX={rdx} RSI={rsi} RDI={rdi} RSP={rsp} RBP={rbp} R8={r8} R9={r9} R10={r10} R11={r11} R12={r12} R13={r13} R14={r14} R15={r15} | EFLAGS={x:eflags} | MEMÓRIA PRÓXIMA: {mem;32@cip}"
+
+
+log "EAX: {eax} EBX: {ebx} ECX: {ecx} EDX: {edx} ESI: {esi} EDI: {edi} EBP: {ebp} ESP: {esp} EIP: {eip} EFLAGS: {eflags} ZF: {_zf} OF: {_of} CF: {_cf} PF: {_pf} SF: {_sf} TF: {_tf} AF: {_af} DF: {_df} IF: {_if} CS: {cs} DS: {ds} ES: {es} FS: {fs} GS: {gs} SS: {ss} DR0: {dr0} DR1: {dr1} DR2: {dr2} DR3: {dr3} DR6: {dr6} DR7: {dr7} XMM0: {xmm0} XMM1: {xmm1} XMM2: {xmm2} XMM3: {xmm3} XMM4: {xmm4} XMM5: {xmm5} XMM6: {xmm6} XMM7: {xmm7} LastError: {lasterror} LastStatus: {laststatus}"
+
 ```
 
 * **ENDEREÇO:** `{p:cip}` para endereço com zeros à esquerda.

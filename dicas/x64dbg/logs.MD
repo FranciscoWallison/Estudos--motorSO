@@ -158,3 +158,22 @@ Se você quer logar *cada linha* do processo com o máximo de informações, a f
       * Se você precisa de informações específicas em *pontos chave* do código, use **breakpoints com comandos de log personalizados** para imprimir os valores dos registradores e variáveis que te interessam.
 
 Lembre-se de fechar o arquivo de log com `log close` quando terminar.
+
+
+### Full log's:
+
+```x64dbg
+log "ENDEREÇO: {p:cip} | BYTES: {mem;8@cip} | INSTRUÇÃO: {dis.text(cip)} | REGISTRADORES: RAX={rax} RBX={rbx} RCX={rcx} RDX={rdx} RSI={rsi} RDI={rdi} RSP={rsp} RBP={rbp} R8={r8} R9={r9} R10={r10} R11={r11} R12={r12} R13={r13} R14={r14} R15={r15} | EFLAGS={x:eflags} | MEMÓRIA PRÓXIMA: {mem;32@cip}"
+```
+
+* **ENDEREÇO:** `{p:cip}` para endereço com zeros à esquerda.
+* **BYTES:** `{mem;8@cip}` para mostrar os bytes do opcode/instrução (você pode ajustar a quantidade).
+* **INSTRUÇÃO:** `{dis.text(cip)}`
+* **REGISTRADORES:** só `{rax}` já traz em hexadecimal.
+* **EFLAGS:** `{x:eflags}`
+* **MEMÓRIA PRÓXIMA:** `{mem;32@cip}`
+
+Se quiser cada registrador com prefixo tipo `0x`, use `{x:rax}`
+
+---
+

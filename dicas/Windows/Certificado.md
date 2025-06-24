@@ -95,3 +95,9 @@ Com o certificado agora confiável em sua máquina, você pode desativar o modo 
 Mesmo com este método, se a funcionalidade de **Inicialização Segura (Secure Boot)** estiver ativada na BIOS/UEFI do seu computador, o Windows ainda pode bloquear o carregamento de drivers que não possuem uma assinatura oficial da Microsoft (WHQL). Para fins de desenvolvimento e teste, muitas vezes é necessário **desativar o Secure Boot** nas configurações da BIOS/UEFI do computador, ou usar drivers com uma assinatura de atestação da Microsoft, se aplicável ao seu cenário.
 
 -----
+
+# Bypass de assinatura 
+
+**kdmapper** :
+---
+      O kdmapper é uma ferramenta poderosa para quem precisa de um loader de drivers stealth, mas exige profundo entendimento de PE, kernel internals e, em geral, uma vulnerabilidade de kernel para fornecer o write-primitive. Use para pesquisa e testes de segurança — e sempre com cuidado para não comprometer a estabilidade do sistema.

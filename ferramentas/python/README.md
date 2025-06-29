@@ -237,3 +237,79 @@ Um script pode:
 ## ⚠️ Observações
 - Bots **não veem como humanos**. Eles **simulam ações** com base em pixels e posições fixas.
 - Muitos jogos tentam **bloquear esse tipo de automação**, usando anti-cheats que detectam movimentações não humanas ou alterações de janela.
+
+________________________
+### O que é e por que usar um ambiente virtual?
+
+Um **ambiente virtual** (“virtual env”) isola uma instalação do Python (e dos pacotes do *pip*) para um projeto específico. Isso evita conflitos de versões, deixa seus requisitos claros (via `requirements.txt`, `pyproject.toml`, etc.) e mantém o sistema limpo.
+
+---
+
+## 1. Usando o módulo *nativo* `venv`
+
+> Funciona a partir do Python 3.3 sem dependências externas.
+
+1. **Crie o ambiente**
+
+   ```bash
+   # escolha um nome de pasta; aqui usei .venv
+   python -m venv .venv
+   ```
+
+2. **Ative**
+
+   | Sistema                  | Comando de ativação          |
+   | ------------------------ | ---------------------------- |
+   | **Linux/macOS**          | `source .venv/bin/activate` ou `source venv/bin/activate`  |
+   | **Windows (cmd.exe)**    | `.venv\Scripts\activate`     |
+   | **Windows (PowerShell)** | `.venv\Scripts\Activate.ps1` |
+
+   > Você saberá que deu certo porque o prompt ganha um prefixo, ex.: `(.venv) $`.
+
+3. **Instale seus pacotes normalmente**
+
+   ```bash
+   pip install numpy requests
+   ```
+
+4. **Congele as dependências (opcional mas recomendado)**
+
+   ```bash
+   pip freeze > requirements.txt
+   ```
+
+5. **Desative quando terminar**
+
+   ```bash
+   deactivate
+   ```
+
+---
+
+## 2. Alternativas populares
+
+| Ferramenta          | Quando considerar                                                                             | Como criar/ativar                                                         |
+| ------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **`virtualenv`**    | Precisa de recursos extras (p.ex. criar envs de Python 2 ou nomear interpreters).             | `pip install virtualenv` → `virtualenv venv_py38 -p python3.8`            |
+| **`pipenv`**        | Quer `Pipfile` + gerenciamento automático de *venv* + *lockfile*.                             | `pip install pipenv` → `pipenv install` (cria e ativa)                    |
+| **`poetry`**        | Projetos que já usam `pyproject.toml`, publicação em PyPI, dependências e *build* integrados. | `pip install poetry` → `poetry init && poetry install` (gera e usa o env) |
+| **`conda`/`mamba`** | Precisa gerenciar versões de Python e libs nativas (ciência de dados).                        | `conda create -n meu_env python=3.12` → `conda activate meu_env`          |
+
+---
+
+## 3. Dicas rápidas
+
+* **Nomeie a pasta** `.venv` ou `env` e adicione-a ao `.gitignore`.
+* Num *IDE* (VS Code, PyCharm), selecione o intérprete dentro da pasta do env; a ativação é automática no terminal integrado.
+* Se você usa **`pre-commit`** ou **testes** em CI, a *virtual env* garante reprodutibilidade.
+* Para remover, basta **deletar a pasta** (`rm -rf .venv` ou via Explorer).
+
+---
+
+### Resumo em 3 linhas
+
+```bash
+python -m venv .venv        # cria
+source .venv/bin/activate   # ativa (Linux/macOS) ou .venv\Scripts\activate (Windows)
+pip install -r requirements.txt  # dentro do env, instale o que precisar
+```

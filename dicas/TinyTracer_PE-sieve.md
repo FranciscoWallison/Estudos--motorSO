@@ -91,7 +91,9 @@ Com um log de rastreamento completo, podemos primeiro ver se alguma das funçõe
 ```
 
 Podemos tentar evitar isso alterando a Versão do SO no Cabeçalho Opcional, conforme descrito no [blog relacionado](https://hshrzd.wordpress.com/2019/06/27/application-shimming-vs-import-table-recovery/). No caso do aplicativo atualmente analisado, mudei o SO para Windows 10 (0xA):
+
 ![alt text](image-6.png)
+
 Podemos ver que o desvio foi bem-sucedido quando as funções chamadas nos mesmos deslocamentos (offsets) são finalmente referenciadas por suas DLLs originais:
 
 ```

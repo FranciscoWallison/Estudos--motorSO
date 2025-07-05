@@ -11,7 +11,7 @@
 
 Neste breve blog, gostaria de demonstrar como desempacotar um executável com o [PE-sieve](https://github.com/hasherezade/pe-sieve/) e o [Tiny Tracer](https://github.com/hasherezade/tiny_tracer/). Como exemplo, vamos usar o executável que foi empacotado com uma versão modificada do UPX:
 
-  * [8f661f16c87169fefc4dc7e612521ad8498c016a0153c51dae67af0b984adaac](https://www.google.com/search?q=https://malshare.com/sample.php%3Faction%3Ddetail%26hash%3D8f661f16c87169fefc4dc7e612521ad8498c016a0153c51dae67af0b984adaac)
+  * [8f661f16c87169fefc4dc7e612521ad8498c016a0153c51dae67af0b984adaac](https://malshare.com/sample.php?action=detail&hash=8f661f16c87169fefc4dc7e612521ad8498c016a0153c51dae67af0b984adaac)
 
 Normalmente, ao lidar com casos empacotados com UPX, podemos usar o [executável original do UPX](https://upx.github.io/) para desempacotá-lo. Mas, como esta é uma versão modificada, não foi possível:
 

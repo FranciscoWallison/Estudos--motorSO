@@ -53,7 +53,9 @@ A primeira coisa que se destaca é que nosso PE possui seções com nomes atípi
 ![alt text](image-3.png)
 
 A primeira seção, “0000”, tem as características de executável definidas, mas está vazia no arquivo (observe o `Raw size: 0`). Podemos prever que é aqui que o código original será preenchido.
+
 ![alt text](image-4.png)
+
 Passando a observar diferentes cabeçalhos, podemos ver que a amostra foi compilada para uma versão antiga do Windows: XP.
 
 ![alt text](image-5.png)

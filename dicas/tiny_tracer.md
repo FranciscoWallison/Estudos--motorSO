@@ -31,6 +31,11 @@ Depois de baixar a plataforma PIN, você precisa descompactá-la no seu diretór
 
 Você pode usar qualquer caminho de sua escolha, apenas lembre-se que isso exigirá um trabalho adicional de edição de alguns caminhos durante a instalação.
 
+Antes iniciar tenah certesa que a sua verão do visual code tenha instaldo `desenvolvimento descktop c ++`:
+
+![image](https://github.com/user-attachments/assets/068e0c16-e1a7-49f4-9bf3-c39deb54fc00)
+
+
 Com o seu PIN descompactado, você precisa clonar/copiar o código-fonte do Tiny Tracer para `\source\tools`. Para que a configuração padrão funcione, o diretório raiz do TinyTracer deve ser: `tiny_tracer`.
 
 ![alt text](image-22.png)

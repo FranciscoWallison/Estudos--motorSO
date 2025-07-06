@@ -64,9 +64,12 @@ Vá para o diretório `install32_64`, onde o kit de ferramentas de instalação 
 
 Se você já tinha o TinyTracer instalado, certifique-se de remover a instalação anterior executando [`delete_menu.reg`](https://www.google.com/search?q=%5Bhttps://github.com/hasherezade/tiny_tracer/blob/master/install32_64/delete_menu.reg%5D\(https://github.com/hasherezade/tiny_tracer/blob/master/install32_64/delete_menu.reg\)) antes de continuar.
 
-Em seguida, leia o [`README.txt`](https://www.google.com/search?q=%5Bhttps://github.com/hasherezade/tiny_tracer/blob/master/install32_64/README.txt%5D\(https://github.com/hasherezade/tiny_tracer/blob/master/install32_64/README.txt\)), para confirmar que todos os caminhos estão definidos corretamente. Se tudo estiver OK, você pode executar o [`add_menu.reg`](https://www.google.com/search?q=%5Bhttps://github.com/hasherezade/tiny_tracer/blob/master/install32_64/add_menu.reg%5D\(https://github.com/hasherezade/tiny_tracer/blob/master/install32_64/add_menu.reg\)) para adicionar seu rastreador PIN ao menu de contexto.
+Em seguida, leia o [`README.txt`](https://github.com/hasherezade/tiny_tracer/tree/master/install32_64), para confirmar que todos os caminhos estão definidos corretamente. Se tudo estiver OK, você pode executar o [`add_menu.reg`](https://www.google.com/search?q=%5Bhttps://github.com/hasherezade/tiny_tracer/blob/master/install32_64/add_menu.reg%5D\(https://github.com/hasherezade/tiny_tracer/blob/master/install32_64/add_menu.reg\)) para adicionar seu rastreador PIN ao menu de contexto.
 
 Como resultado, você deve ver a opção adicional `Run with PIN (Tiny Tracer)`:
+
+![image](https://github.com/user-attachments/assets/08eade22-5c99-434d-aa12-c5ed507786c3)
+
 
 ### Demonstração
 

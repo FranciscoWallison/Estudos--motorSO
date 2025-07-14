@@ -48,8 +48,7 @@ Para modificar, burlar, ou analisar apps Android baixados da Play Store, as prin
 * Para APK: use **JADX, APKTool, Ghidra (para libs .so), Frida, Magisk, Xposed, Objection**.
 * **x64dbg** não serve para APK, pois não lida com ARM/DEX, só PE/x86/x64.
 * **Magisk** é o root moderno, mais furtivo, e aceita módulos de manipulação.
-
-Se quiser exemplos práticos de como usar alguma dessas ferramentas para um objetivo específico (tipo bypass de root, remover ads, desbloquear funções), só avisar!
+-----
 
 
 

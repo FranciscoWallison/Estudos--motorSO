@@ -50,3 +50,89 @@ Para modificar, burlar, ou analisar apps Android baixados da Play Store, as prin
 * **Magisk** é o root moderno, mais furtivo, e aceita módulos de manipulação.
 
 Se quiser exemplos práticos de como usar alguma dessas ferramentas para um objetivo específico (tipo bypass de root, remover ads, desbloquear funções), só avisar!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 1 ▪ Jadx
+
+**O que é:** decompilador open-source que converte arquivos **DEX/APK** (byte-code Dalvik/ART) em **Java/Kotlin legível**.
+**Para que serve:**
+
+* Análise de segurança e auditoria de apps Android.
+* “Inspect” rápido para entender bibliotecas closed-source.
+* Conferir se informações sensíveis ficaram hard-coded no APK.
+
+| Recurso                      | Detalhes práticos                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Interface GUI e CLI**      | `jadx-gui` mostra árvore de pacotes, busca por string e hex-view; `jadx` (terminal) gera projeto completo no disco. |
+| **Decompilação de Recursos** | Extrai XML, *drawables* e assets; recria `AndroidManifest.xml` com formatação original.                             |
+| **Recomprilação opcional**   | Não recompila APK, mas gera código limpo que pode ser aberto no Android Studio para recompilar manualmente.         |
+| **Suporte a Java 17/21**     | Versões ≥ 1.5 tratam opcodes mais novos e *record classes*.                                                         |
+| **Plugins**                  | Script de destaque de patches, exportação para Ghidra, search avançado etc.                                         |
+
+*Vantagens*
+
+* **Fácil**: arraste-e-solte o APK e comece a ler.
+* **Rápido**: decompila projetos grandes em segundos graças à engine multithread.
+* **Licença Apache 2.0** – uso comercial liberado.
+
+*Limitações*
+
+* Código ofuscado por R8/ProGuard sai com nomes ‘a/b/c’.
+* Blocos pesados em Kotlin Coroutines ou Dagger às vezes viram `goto/label`.
+* Não cobre **native libs** (`.so`) – precisa de Ghidra/IDA para C/C++.
+
+---
+
+### 2 ▪ Bytecode Viewer (BCV)
+
+(*Provavelmente o “byteviewer” que você citou; mantém o nome “Bytecode Viewer”*)
+
+Ferramenta “tudo-em-um” para **classes Java/Kotlin, DEX e inclusive JARs/war**.
+
+| Recurso                                   | Explicação                                                                                                               |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Múltiplos decompiladores side-by-side** | FernFlower, CFR, Procyon, Krakatau, Jadx-smali: compare resultados em abas.                                              |
+| **Visualizador de byte-code**             | Abas “ASMifier” e “CFR-Bytecode” mostram instruções JVM (ILOAD, INVOKEVIRTUAL…) → ótimo para quem quer entender a stack. |
+| **Inline-Hex & strings**                  | Destaca chunks literais para caça a credenciais.                                                                         |
+| **Live patch**                            | Edite o `.java`, compile no próprio app e injete de volta no JAR/DEX.                                                    |
+| **Suporte a plugins**                     | Ex.: buscador de *obfuscation patterns*, extrator de assets, exportador para JSON.                                       |
+| **Função anti-tamper**                    | Gera patch para remover verificações de assinatura/cheats – útil em pesquisa, mas cuidado com aspectos legais.           |
+
+*Vantagens*
+
+* **Tudo em uma janela**: decompilar, ver byte-code, hex, editar, recompilar.
+* **Comparar decompiladores** evita erros que um engine só mostraria.
+* Roda via **Java FX** → multiplataforma.
+
+*Desvantagens*
+
+* Heavier: carrega todos os decompiladores, consome mais RAM.
+* Atualizações menos frequentes (projeto comunitário desde 2014).
+* Para APKs grandes, Jadx costuma ser mais rápido e estável.
+

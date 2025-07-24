@@ -40,5 +40,5 @@ O **Burp Suite** é uma ferramenta profissional de **teste de segurança de apli
 * Verificar se cookies estão sendo transmitidos com segurança (e.g., `HttpOnly`, `Secure`, etc).
 * Automatizar fuzzing em campos de entrada.
 
-Viceos 
+Videos 
 [Dominando o Burp Suite](https://www.youtube.com/watch?v=qOJmTB_9-3g)

@@ -52,31 +52,6 @@ Para modificar, burlar, ou analisar apps Android baixados da Play Store, as prin
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### 1 ▪ Jadx
 
 **O que é:** decompilador open-source que converte arquivos **DEX/APK** (byte-code Dalvik/ART) em **Java/Kotlin legível**.
@@ -135,3 +110,7 @@ Ferramenta “tudo-em-um” para **classes Java/Kotlin, DEX e inclusive JARs/war
 * Atualizações menos frequentes (projeto comunitário desde 2014).
 * Para APKs grandes, Jadx costuma ser mais rápido e estável.
 
+
+
+
+#### **PCAP** Manipulação de rede [PCAPdroid](https://github.com/emanuele-f/PCAPdroid)

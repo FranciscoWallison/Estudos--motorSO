@@ -1,0 +1,1 @@
+python bot_canvas.py --pid 58924 --img-root "C:\\PROJETOS\\PASTA\\img" --threshold 0.92 --cooldown 0.10 --watch

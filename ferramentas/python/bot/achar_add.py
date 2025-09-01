@@ -4,7 +4,14 @@
 # python achar_add.py --pid 32048 --pattern "C4 ?? ?? 11 44 02 24"
 # python achar_add.py --pid 32048 --pattern "89 E5 6A 08 56 48 83 EC 30 48 8B 5E 17"
 # python achar_add.py --pid 32048 --max-matches 3
+# Para procurar pela assinatura do prólogo da função que analisamos:
+# python achar_add.py --pid 25452 --pattern "89 E5 6A 08 56 48 83 EC 30 48 8B 5E 17"
 
+# Para procurar com curinga (wildcard):
+# python achar_add.py --pid 25452 --pattern "C4 ?? ?? 11 44 02 24"
+
+# Para encontrar até 3 ocorrências:
+# python achar_add.py --pid 25452 --pattern "89 E5 6A 08 56 48 83 EC 30" --max-matches 3
 
 ```py
 #!/usr/bin/env python3
@@ -274,3 +281,4 @@ if __name__ == "__main__":
 
 
 ```
+

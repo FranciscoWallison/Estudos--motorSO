@@ -2,6 +2,7 @@
 # # opcional:
 # python achar_add.py --pid 32048 --pattern "C5 FA 11 44 02 24"
 # python achar_add.py --pid 32048 --pattern "C4 ?? ?? 11 44 02 24"
+# python achar_add.py --pid 32048 --pattern "89 E5 6A 08 56 48 83 EC 30 48 8B 5E 17"
 # python achar_add.py --pid 32048 --max-matches 3
 
 
@@ -270,5 +271,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 ```

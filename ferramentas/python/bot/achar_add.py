@@ -13,6 +13,12 @@
 # Para encontrar até 3 ocorrências:
 # python achar_add.py --pid 25452 --pattern "89 E5 6A 08 56 48 83 EC 30" --max-matches 3
 # python achar_add.py --pid 25452 --pattern "C5 F8 2E D0 0F 87 ?? ?? ?? ?? 4E 8B 0C 03"
+# python achar_add.py --pid [SEU_PID] --pattern "4E 8B 44 03 08 4C 89 84 3B A4 00 00 00"
+
+
+
+
+
 ```py
 #!/usr/bin/env python3
 # achar_add.py
@@ -281,5 +287,6 @@ if __name__ == "__main__":
 
 
 ```
+
 
 

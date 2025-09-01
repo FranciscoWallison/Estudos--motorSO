@@ -17,7 +17,8 @@
 
 
 
-
+vidia do mob 
+python achar_add.py --pid [SEU_PID] --pattern "4E 8B 0C 03 4C 89 8C 3B 9C 00 00 00 4E 8B 44 03 08"
 
 ```py
 #!/usr/bin/env python3
@@ -287,6 +288,7 @@ if __name__ == "__main__":
 
 
 ```
+
 
 
 

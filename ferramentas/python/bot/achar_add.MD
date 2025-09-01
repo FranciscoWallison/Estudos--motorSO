@@ -2,23 +2,90 @@
 # # opcional:
 # python achar_add.py --pid 32048 --pattern "C5 FA 11 44 02 24"
 # python achar_add.py --pid 32048 --pattern "C4 ?? ?? 11 44 02 24"
-# python achar_add.py --pid 32048 --pattern "89 E5 6A 08 56 48 83 EC 30 48 8B 5E 17"
-# python achar_add.py --pid 32048 --max-matches 3
-# Para procurar pela assinatura do prólogo da função que analisamos:
-# python achar_add.py --pid 25452 --pattern "89 E5 6A 08 56 48 83 EC 30 48 8B 5E 17"
 
-# Para procurar com curinga (wildcard):
-# python achar_add.py --pid 25452 --pattern "C4 ?? ?? 11 44 02 24"
+### Sua Caixa de Ferramentas de Análise (Pontos de Partida)
 
-# Para encontrar até 3 ocorrências:
-# python achar_add.py --pid 25452 --pattern "89 E5 6A 08 56 48 83 EC 30" --max-matches 3
-# python achar_add.py --pid 25452 --pattern "C5 F8 2E D0 0F 87 ?? ?? ?? ?? 4E 8B 0C 03"
-# python achar_add.py --pid [SEU_PID] --pattern "4E 8B 44 03 08 4C 89 84 3B A4 00 00 00"
+Aqui estão as assinaturas mais importantes que encontramos, organizadas por função e objetivo.
 
+#### Como Usar Este Guia:
 
+1.  **Defina seu Objetivo:** Decida qual parte da lógica você quer analisar (ex: "quero encontrar o evento de morte").
+2.  **Escolha a Assinatura:** Encontre o objetivo correspondente abaixo e copie a assinatura de bytes.
+3.  **Execute o Comando:** Cole a assinatura no seu comando `python achar_add.py` e execute.
+4.  **Inicie a Análise:** O endereço retornado será seu ponto de partida no debugger.
 
-vidia do mob 
-python achar_add.py --pid [SEU_PID] --pattern "4E 8B 0C 03 4C 89 8C 3B 9C 00 00 00 4E 8B 44 03 08"
+-----
+
+### 1\. Função Principal (Variante 2 - A mais completa que encontramos)
+
+Esta é a função mais importante, pois ela não só sincroniza o estado do monstro, mas também contém a verificação de tipo e a lógica que leva ao evento de morte.
+
+#### 🎯 **Objetivo: Encontrar o PONTO DE PARTIDA PRINCIPAL (Âncora Mestra)**
+
+Esta assinatura encontra o início da lógica de comparação de distância, que serve como uma âncora confiável para todos os outros pontos de interesse nesta função.
+
+  * **Descrição:** Encontra a sequência de código que prepara e executa a comparação de distância (`mov r10d`, `vmovd`, `vucomiss`).
+  * **Assinatura (Pattern):**
+    ```
+    41 BA FE E6 DB 2E C4 C1 79 6E C2 C5 F8 2E C8
+    ```
+  * **Comando:**
+    ```bash
+    python achar_add.py --pid [SEU_PID] --pattern "41 BA FE E6 DB 2E C4 C1 79 6E C2 C5 F8 2E C8"
+    ```
+  * **O que você encontra:** O endereço onde o `mov r10d, ...` começa. A partir daqui, você pode navegar para todos os outros pontos importantes (cópia de dados, verificação de morte, etc.) usando offsets fixos.
+
+#### 🎯 **Objetivo: Encontrar o EVENTO DE MORTE (O mais importante)**
+
+Esta assinatura procura diretamente pela lógica de subtração de vida e a verificação `if (vida < 0)`.
+
+  * **Descrição:** Encontra a instrução `sub` que aplica dano à vida do monstro, seguida pela instrução `js` que pula para a rotina de morte.
+  * **Assinatura (Pattern) com Curingas:**
+    ```
+    41 81 AA ?? ?? ?? ?? ?? ?? ?? ?? 0F 88
+    ```
+    *(Nota: Usamos curingas `??` porque o offset da vida e o valor do dano podem mudar).*
+  * **Comando:**
+    ```bash
+    python achar_add.py --pid [SEU_PID] --pattern "41 81 AA ?? ?? ?? ?? ?? ?? ?? ?? 0F 88"
+    ```
+  * **O que você encontra:** O endereço onde a instrução `sub [r10+offset], dano` começa. A instrução `js` estará logo depois. O destino do `js` é o seu evento de morte.
+
+#### 🎯 **Objetivo: Encontrar a escrita da "Propriedade Float em +24h"**
+
+Esta assinatura encontra a instrução específica `vmovss` que escreve no offset `+24h` da estrutura do monstro.
+
+  * **Descrição:** Encontra o bloco de código que prepara os registradores e escreve o valor de uma "melhoria" (buff, escudo, etc.).
+  * **Assinatura (Pattern):**
+    ```
+    8B 45 C4 48 8B 75 F0 48 8B 4E 17 C5 FA 11 4C 01 24
+    ```
+  * **Comando:**
+    ```bash
+    python achar_add.py --pid [SEU_PID] --pattern "8B 45 C4 48 8B 75 F0 48 8B 4E 17 C5 FA 11 4C 01 24"
+    ```
+  * **O que você encontra:** O endereço do `mov eax,[rbp-3C]`. A instrução `vmovss` que você procura estará `0xB` (11) bytes depois.
+
+-----
+
+### 2\. Função de Sincronização (Variante 1 - A primeira que analisamos)
+
+Esta função é mais simples e focada apenas na sincronização do vetor de 4 componentes.
+
+#### 🎯 **Objetivo: Encontrar o Bloco de Cópia do Vetor (Posição/Rotação)**
+
+Esta assinatura encontra a sequência completa de cópia dos 16 bytes do vetor.
+
+  * **Descrição:** Encontra a sequência `mov r9,...` (copia x,y) -\> `mov [dest],r9` -\> `mov r8,...` (copia z,w).
+  * **Assinatura (Pattern):**
+    ```
+    4E 8B 0C 03 4C 89 8C 3B 9C 00 00 00 4E 8B 44 03 08
+    ```
+  * **Comando:**
+    ```bash
+    python achar_add.py --pid [SEU_PID] --pattern "4E 8B 0C 03 4C 89 8C 3B 9C 00 00 00 4E 8B 44 03 08"
+    ```
+  * **O que você encontra:** O endereço onde o primeiro `mov r9,...` começa. Este é o local exato onde os dados de posição/rotação do monstro são lidos da origem para serem copiados. Você corrigiu sua nota de "vida do mob" para esta, o que está correto.
 
 ```py
 #!/usr/bin/env python3
@@ -288,6 +355,7 @@ if __name__ == "__main__":
 
 
 ```
+
 
 
 

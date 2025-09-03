@@ -221,7 +221,8 @@ static HANDLE WINAPI HookedOpenProcess(DWORD access, BOOL inherit, DWORD pid) {
         SetLastError(ERROR_ACCESS_DENIED);
         return NULL;
     }
-    LOG("OpenProcess(pid=%lu, access=0x%X)", pid, access);
+    // [ 377070812][T19676] OpenProcess(pid=5980, access=0x101000)
+    // LOG("OpenProcess(pid=%lu, access=0x%X)", pid, access);   
     return originalOpenProcess(access, inherit, pid);
 }
 
@@ -256,29 +257,58 @@ static BOOL WINAPI HookedReadProcessMemory(HANDLE hProcess, LPCVOID addr, LPVOID
 }
 
 
-static LPTOP_LEVEL_EXCEPTION_FILTER WINAPI HookedSetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER f) {
-    LOG("SetUnhandledExceptionFilter(new=%p) -> bloqueando alteração (retornando o anterior).", f);
-    // return originalSetUnhandledExceptionFilter(f);
-    return NULL; // Impede que o novo filtro seja definido, retornando NULL.
+static LPTOP_LEVEL_EXCEPTION_FILTER WINAPI HookedSetUnhandledExceptionFilter(
+    LPTOP_LEVEL_EXCEPTION_FILTER f
+) {
+    LOG("SetUnhandledExceptionFilter(new=%p) [pass-through]", f);
+    // Deixe o app instalar o handler: evita loops/exceções não tratadas
+    return originalSetUnhandledExceptionFilter(f);
 }
 
 
 static BOOL WINAPI HookedVirtualProtect(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect) {
-    LOG("VirtualProtect() INICIO. Endereço: %p, Tamanho: %zu, Novo Prot: 0x%X", lpAddress, dwSize, flNewProtect);
-    BOOL result = originalVirtualProtect(lpAddress, dwSize, flNewProtect, lpflOldProtect);
-    if (result) {
-        LOG("VirtualProtect() FIM. Sucesso. Antigo Prot: 0x%X", (lpflOldProtect ? *lpflOldProtect : 0));
-    } else {
-        LOG("VirtualProtect() FIM. FALHOU. GetLastError() = %lu", GetLastError());
+    
+    DWORD modifiableProtect = flNewProtect;
+
+    // Verificamos a permissão solicitada e forçamos a adição de permissão de escrita
+    // Isso é feito para garantir que possamos modificar a memória para análise.
+    if (!(flNewProtect & (PAGE_EXECUTE_READWRITE | PAGE_READWRITE | PAGE_WRITECOPY))) {
+        // Se a página é executável, adicione escrita para torná-la EXECUTE_READWRITE
+        if (flNewProtect & (PAGE_EXECUTE | PAGE_EXECUTE_READ)) {
+            modifiableProtect = PAGE_EXECUTE_READWRITE;
+        } 
+        // Se for apenas de leitura, adicione escrita para torná-la READWRITE
+        else if (flNewProtect & PAGE_READONLY) {
+            modifiableProtect = PAGE_READWRITE;
+        }
+        // Em outros casos, podemos tentar adicionar a flag PAGE_WRITECOPY
+        else {
+             modifiableProtect |= PAGE_WRITECOPY;
+        }
+
+        LOG("!!! VirtualProtect: FORÇANDO PERMISSÃO DE ESCRITA. Original: 0x%X, Modificado: 0x%X", flNewProtect, modifiableProtect);
     }
-    return result;
+
+    return originalVirtualProtect(lpAddress, dwSize, modifiableProtect, lpflOldProtect);
 }
 
-static BOOL WINAPI HookedVirtualProtectEx(HANDLE hProc, LPVOID addr, SIZE_T sz, DWORD newProt, PDWORD oldProt) {
-    if (newProt & (PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY)) {
-        LOG("VirtualProtectEx EXEC proc=%p addr=%p size=%llu", hProc, addr, (unsigned long long)sz);
+static BOOL WINAPI HookedVirtualProtectEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect) {
+
+    DWORD modifiableProtect = flNewProtect;
+
+    if (!(flNewProtect & (PAGE_EXECUTE_READWRITE | PAGE_READWRITE | PAGE_WRITECOPY))) {
+        if (flNewProtect & (PAGE_EXECUTE | PAGE_EXECUTE_READ)) {
+            modifiableProtect = PAGE_EXECUTE_READWRITE;
+        } else if (flNewProtect & PAGE_READONLY) {
+            modifiableProtect = PAGE_READWRITE;
+        } else {
+            modifiableProtect |= PAGE_WRITECOPY;
+        }
+
+        LOG("!!! VirtualProtectEx: FORÇANDO PERMISSÃO DE ESCRITA. Original: 0x%X, Modificado: 0x%X", flNewProtect, modifiableProtect);
     }
-    return originalVirtualProtectEx(hProc, addr, sz, newProt, oldProt);
+    
+    return originalVirtualProtectEx(hProcess, lpAddress, dwSize, modifiableProtect, lpflOldProtect);
 }
 
 static SIZE_T WINAPI HookedVirtualQuery(LPCVOID addr, PMEMORY_BASIC_INFORMATION mbi, SIZE_T len) {
@@ -314,11 +344,21 @@ static VOID WINAPI HookedExitProcess(UINT code) {
 }
 
 static BOOL WINAPI HookedTerminateProcess(HANDLE hProc, UINT code) {
+    // Se o handle for o do processo atual, bloqueie a chamada
+    if (hProc == GetCurrentProcess()) {
+        LOG("!!! BLOQUEADO: Tentativa de TerminateProcess no próprio processo (code=%u)", code);
+        return TRUE; // Minta, dizendo que o processo foi terminado com sucesso
+    }
     LOG("TerminateProcess(proc=%p, code=%u)", hProc, code);
     return originalTerminateProcess(hProc, code);
 }
 
 static NTSTATUS NTAPI HookedNtTerminateProcess(HANDLE hProc, NTSTATUS status) {
+    // Se o handle for o do processo atual, bloqueie a chamada
+    if (hProc == GetCurrentProcess()) {
+        LOG("!!! BLOQUEADO: Tentativa de NtTerminateProcess no próprio processo (status=0x%08X)", (unsigned)status);
+        return STATUS_SUCCESS; // Minta, dizendo que a operação foi bem-sucedida
+    }
     LOG("NtTerminateProcess(proc=%p, status=0x%08X)", hProc, (unsigned)status);
     return originalNtTerminateProcess(hProc, status);
 }
@@ -343,9 +383,16 @@ static NTSTATUS NTAPI HookedNtSetInformationThread(HANDLE th, THREADINFOCLASS cl
 
 // NtQueryInformationProcess com melhorias (23/37/43 + throttle)
 static NTSTATUS NTAPI HookedNtQueryInformationProcess(HANDLE proc, PROCESSINFOCLASS pic, PVOID info, ULONG infolen, PULONG retlen) {
-    if ((int)pic == 23) { // flood comum
-        static int cnt = 0;
-        if ((++cnt % 1000) == 0) LOG("NtQueryInformationProcess [throttled] class=23 count=%d", cnt);
+    if (pic == (PROCESSINFOCLASS)0 /*ProcessBasicInformation*/) {
+        static int c0 = 0;
+        if ((++c0 % 1000) == 0) {
+            LOG("NtQueryInformationProcess [throttled] class=0 (count=%d)", c0);
+        }
+    } else if (pic == (PROCESSINFOCLASS)23) {
+        static int c23 = 0;
+        if ((++c23 % 1000) == 0) {
+            LOG("NtQueryInformationProcess [throttled] class=23 (count=%d)", c23);
+        }
     } else {
         LOG("NtQueryInformationProcess class=%d", (int)pic);
     }
@@ -453,10 +500,43 @@ static BOOL WINAPI HookedAdjustTokenPrivileges(HANDLE TokenHandle, BOOL DisableA
 }
 
 
-static NTSTATUS NTAPI HookedNtReadVirtualMemory(HANDLE ProcessHandle, PVOID BaseAddress, PVOID Buffer, SIZE_T NumberOfBytesToRead, PSIZE_T NumberOfBytesRead)
-{
-    LOG("NtReadVirtualMemory chamado. Processo: %p, Lendo do endereço: %p, Tamanho: %llu", ProcessHandle, BaseAddress, NumberOfBytesToRead);
-    return originalNtReadVirtualMemory(ProcessHandle, BaseAddress, Buffer, NumberOfBytesToRead, NumberOfBytesRead);
+static NTSTATUS NTAPI HookedNtReadVirtualMemory(
+    HANDLE ProcessHandle,
+    PVOID BaseAddress,
+    PVOID Buffer,
+    SIZE_T NumberOfBytesToRead,
+    PSIZE_T NumberOfBytesRead
+) {
+    // contador por segundo (leve)
+    static ULONGLONG lastTick = 0;
+    static ULONG readsInWindow = 0;
+
+    ULONGLONG now = GetTickCount64();
+    if (now - lastTick >= 1000) {
+        // resumo 1x/s (evita poluir)
+        LOG("NtReadVirtualMemory rate: %lu reads/s", readsInWindow);
+        lastTick = now;
+        readsInWindow = 0;
+    }
+    ++readsInWindow;
+
+    // throttle de log:
+    const BOOL isSelf =
+        (ProcessHandle == GetCurrentProcess()) ||
+        (ProcessHandle == (HANDLE)(ULONG_PTR)-1);
+
+    // Regra: só loga se NÃO for self **e**
+    //   - leitura grande (>= 0x1000), ou
+    //   - 1 a cada 64 chamadas
+    if (!isSelf && (NumberOfBytesToRead >= 0x1000 || ((readsInWindow & 0x3F) == 0))) {
+        LOG("NtReadVirtualMemory proc=%p addr=%p size=%llu",
+            ProcessHandle, BaseAddress, (unsigned long long)NumberOfBytesToRead);
+    }
+
+    return originalNtReadVirtualMemory(
+        ProcessHandle, BaseAddress, Buffer,
+        NumberOfBytesToRead, NumberOfBytesRead
+    );
 }
 
 static NTSTATUS NTAPI HookedNtQueueApcThread(HANDLE ThreadHandle, PVOID ApcRoutine, PVOID ApcArgument1, PVOID ApcArgument2, PVOID ApcArgument3) {
@@ -475,9 +555,23 @@ static NTSTATUS NTAPI HookedNtAllocateVirtualMemory(HANDLE ProcessHandle, PVOID*
     return originalNtAllocateVirtualMemory(ProcessHandle, BaseAddress, ZeroBits, RegionSize, AllocationType, Protect);
 }
 
-static NTSTATUS NTAPI HookedNtProtectVirtualMemory(HANDLE hProc, PVOID* addr, PSIZE_T sz, ULONG newProt, PULONG oldProt) {
-    LOG("NtProtectVirtualMemory(proc=%p, addr=%p, size=%llu, prot=0x%X)", hProc, *addr, (unsigned long long)*sz, newProt);
-    return originalNtProtectVirtualMemory(hProc, addr, sz, newProt, oldProt);
+static NTSTATUS NTAPI HookedNtProtectVirtualMemory(HANDLE ProcessHandle, PVOID* BaseAddress, PSIZE_T RegionSize, ULONG NewProtect, PULONG OldProtect) {
+
+    ULONG modifiableProtect = NewProtect;
+
+    if (!(NewProtect & (PAGE_EXECUTE_READWRITE | PAGE_READWRITE | PAGE_WRITECOPY))) {
+        if (NewProtect & (PAGE_EXECUTE | PAGE_EXECUTE_READ)) {
+            modifiableProtect = PAGE_EXECUTE_READWRITE;
+        } else if (NewProtect & PAGE_READONLY) {
+            modifiableProtect = PAGE_READWRITE;
+        } else {
+            modifiableProtect |= PAGE_WRITECOPY;
+        }
+
+        // LOG("!!! NtProtectVirtualMemory: FORÇANDO PERMISSÃO DE ESCRITA. Original: 0x%X, Modificado: 0x%X", NewProtect, modifiableProtect);
+    }
+
+    return originalNtProtectVirtualMemory(ProcessHandle, BaseAddress, RegionSize, modifiableProtect, OldProtect);
 }
 
 // =========================
@@ -571,7 +665,7 @@ DWORD WINAPI InitHookThread(LPVOID) {
         if (!CHR("NtQueryVirtualMemory",     (LPVOID)HookedNtQueryVirtualMemory,     (LPVOID*)&originalNtQueryVirtualMemory))     return FALSE;
         if (!CHR("NtWriteVirtualMemory",     (LPVOID)HookedNtWriteVirtualMemory,     (LPVOID*)&originalNtWriteVirtualMemory))     return FALSE;
         // if (!CHR("NtAllocateVirtualMemory",  (LPVOID)HookedNtAllocateVirtualMemory,  (LPVOID*)&originalNtAllocateVirtualMemory))  return FALSE;
-        // if (!CHR("NtProtectVirtualMemory",   (LPVOID)HookedNtProtectVirtualMemory,   (LPVOID*)&originalNtProtectVirtualMemory))   return FALSE;
+        if (!CHR("NtProtectVirtualMemory",   (LPVOID)HookedNtProtectVirtualMemory,   (LPVOID*)&originalNtProtectVirtualMemory))   return FALSE;
         if (!CHR("NtTerminateProcess",       (LPVOID)HookedNtTerminateProcess,       (LPVOID*)&originalNtTerminateProcess))       return FALSE;
     }
 

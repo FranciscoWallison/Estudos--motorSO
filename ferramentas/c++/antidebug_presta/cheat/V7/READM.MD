@@ -1,0 +1,1 @@
+ g++ -std=gnu++17 -shared -static-libgcc -static-libstdc++   -o hook_antidebug_duplo_7vs_x64.dll hook_antidebug_duplo_7vs.cpp   MinHook/src/buffer.c MinHook/src/trampoline.c MinHook/src/hook.c MinHook/src/hde/hde64.c   -I MinHook/include -D _CRT_SECURE_NO_WARNINGS   -luser32 -lkernel32

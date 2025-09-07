@@ -87,6 +87,15 @@ Esta assinatura encontra a sequência completa de cópia dos 16 bytes do vetor.
     ```
   * **O que você encontra:** O endereço onde o primeiro `mov r9,...` começa. Este é o local exato onde os dados de posição/rotação do monstro são lidos da origem para serem copiados. Você corrigiu sua nota de "vida do mob" para esta, o que está correto.
 
+
+
+HP
+
+
+python achar_add.py --pid 1234 --pattern "89 7C 03 78"
+
+python achar_add.py --pid 1234 --pattern "89 54 13 14"
+
 ```py
 #!/usr/bin/env python3
 # achar_add.py
@@ -355,6 +364,7 @@ if __name__ == "__main__":
 
 
 ```
+
 
 
 
